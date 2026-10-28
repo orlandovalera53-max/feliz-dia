@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Verito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rosa:#ff6fa5;
+    --morado:#a06bff;
+    --amarillo:#ffc93c;
+    --texto:#4a3b52;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Quicksand','Segoe UI',system-ui,sans-serif;
+    background:linear-gradient(160deg,#ffeef6 0%,#fff6e0 50%,#eaf4ff 100%);
+    min-height:100vh;
+    color:var(--texto);
+    overflow-x:hidden;
+    padding:20px 14px 60px;
+  }
+
+  /* ===== Fondo flotante ===== */
+  #fondo{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+  .emoji-flotante{
+    position:absolute;bottom:-70px;font-size:26px;opacity:.45;
+    animation:subir linear infinite;
+  }
+  @keyframes subir{
+    to{transform:translateY(-115vh) rotate(360deg);opacity:0;}
+  }
+
+  main{position:relative;z-index:1;max-width:880px;margin:0 auto;}
+
+  /* ===== Tarjetas ===== */
+  .card{
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-radius:28px;
+    padding:28px 24px;
+    box-shadow:0 14px 44px rgba(255,111,165,.16);
+    border:2px solid rgba(255,255,255,.9);
+    margin-bottom:24px;
+    animation:aparecer .7s ease both;
+  }
+  @keyframes aparecer{
+    from{opacity:0;transform:translateY(22px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ===== Hero ===== */
+  .hero{text-align:center;padding-top:36px;}
+  .hero-cat{
+    font-size:64px;display:inline-block;
+    animation:saludar 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 8px 14px rgba(255,201,60,.5));
+  }
+  @keyframes saludar{
+    0%,100%{transform:translateY(0) rotate(-6deg);}
+    50%{transform:translateY(-12px) rotate(6deg);}
+  }
+  h1{
+    font-size:clamp(2rem,7.5vw,3.2rem);
+    line-height:1.15;
+    margin:10px 0 8px;
+    background:linear-gradient(90deg,#ff6fa5,#a06bff,#ffb300,#ff6fa5);
+    background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;
+    color:transparent;
+    animation:degradado 7s linear infinite;
+    font-weight:700;
+  }
+  @keyframes degradado{
+    to{background-position:300% 0;}
+  }
+  .sub{
+    font-size:clamp(.95rem,3.2vw,1.15rem);
+    color:#8a6f9c;font-weight:600;
+    max-width:540px;margin:0 auto;
+  }
+
+  /* ===== Títulos de sección ===== */
+  h2{
+    font-size:1.35rem;margin-bottom:14px;
+    display:flex;align-items:center;gap:9px;
+    color:#7a4f95;
+  }
+
+  /* ===== Carta ===== */
+  .carta p{
+    font-size:1.02rem;line-height:1.85;margin-bottom:14px;color:#5a4666;
+  }
+  .carta p:last-child{margin-bottom:0;}
+  .carta .firma{
+    text-align:right;font-weight:700;color:var(--rosa);font-size:1.05rem;
+    margin-top:6px;
+  }
+  .destacado{
+    background:linear-gradient(120deg,rgba(255,201,60,.35),rgba(255,111,165,.25));
+    padding:2px 7px;border-radius:8px;font-weight:700;
+  }
+
+  /* ===== Juegos ===== */
+  .juego{
+    background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(255,247,252,.85));
+    border:2px solid #ffe4f1;
+    border-radius:24px;
+    padding:22px 18px;
+    margin-bottom:20px;
+  }
+  .juego h3{
+    font-size:1.1rem;color:#8a4fa8;margin-bottom:6px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .juego .desc{font-size:.87rem;color:#96789f;margin-bottom:16px;}
+
+  /* Quiz */
+  .pregunta{font-weight:700;font-size:1rem;margin-bottom:14px;color:#5a4666;}
+  .opciones{display:grid;gap:9px;}
+  .opcion{
+    font-family:inherit;font-size:.92rem;font-weight:600;
+    text-align:left;padding:12px 16px;
+    border-radius:14px;border:2px solid #f0dcfa;
+    background:#fff;color:#5a4666;cursor:pointer;
+    transition:all .18s ease;
+  }
+  .opcion:hover:not(:disabled){transform:translateX(4px);border-color:var(--morado);background:#fbf4ff;}
+  .opcion:disabled{cursor:default;}
+  .opcion.correcta{background:#dcffe9;border-color:#4cd48a;color:#1f8a52;}
+  .opcion.incorrecta{background:#ffe3ea;border-color:#ff8fb0;color:#c43e6a;}
+  .feedback{
+    margin-top:14px;font-weight:700;font-size:.92rem;min-height:24px;
+    color:var(--rosa);text-align:center;
+  }
+  .progreso{
+    font-size:.8rem;font-weight:700;color:#a98ec2;margin-bottom:10px;
+  }
+
+  /* Memoria */
+  .mem-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:9px;
+    max-width:420px;margin:0 auto;
+  }
+  .mem-card{
+    perspective:700px;background:none;border:none;padding:0;
+    aspect-ratio:1;cursor:pointer;
+  }
+  .mem-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .45s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .mem-card.flipped .mem-inner{transform:rotateY(180deg);}
+  .mem-card.matched .mem-inner{transform:rotateY(180deg);}
+  .face{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:15px;font-size:1.6rem;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  }
+  .front{background:linear-gradient(135deg,#ffb3d1,#c9a6ff);box-shadow:0 5px 14px rgba(160,107,255,.25);}
+  .back{background:#fff;border:2px solid #ffe0ef;transform:rotateY(180deg);}
+  .mem-card.matched .back{background:#fffbe8;border-color:var(--amarillo);animation:pop .4s ease;}
+  @keyframes pop{50%{transform:rotateY(180deg) scale(1.12);}}
+  .mem-info{text-align:center;font-weight:700;font-size:.85rem;color:#a98ec2;margin-top:14px;}
+
+  /* Atrapa gatos */
+  #playfield{
+    position:relative;height:330px;border-radius:20px;overflow:hidden;
+    background:linear-gradient(180deg,#eaf6ff,#fff6e0);
+    border:2px dashed #ffd0e4;
+  }
+  .falling-cat{
+    position:absolute;top:-70px;cursor:pointer;user-select:none;
+    animation:caerGato linear forwards;
+  }
+  @keyframes caerGato{to{transform:translateY(430px) rotate(25deg);}}
+  .cat-hud{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;flex-wrap:wrap;margin-bottom:12px;
+  }
+  .hud-item{
+    font-weight:700;font-size:.9rem;color:#7a4f95;
+    background:#fff;padding:8px 16px;border-radius:999px;border:2px solid #f0dcfa;
+  }
+  .btn{
+    font-family:inherit;font-weight:700;font-size:.92rem;
+    padding:11px 26px;border-radius:999px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--rosa),var(--morado));
+    color:#fff;box-shadow:0 8px 20px rgba(255,111,165,.4);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-2px) scale(1.03);box-shadow:0 12px 26px rgba(255,111,165,.5);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;}
+
+  /* Recompensas */
+  .medallas-lista{display:grid;gap:12px;}
+  .medalla{
+    display:flex;align-items:center;gap:14px;
+    background:linear-gradient(135deg,#fffdf2,#fff0f7);
+    border:2px solid #ffe3a8;
+    border-radius:18px;padding:14px 16px;
+    animation:aparecer .55s ease both;
+  }
+  .medalla .icono{font-size:32px;flex-shrink:0;}
+  .medalla strong{display:block;color:#b3568a;font-size:.98rem;margin-bottom:3px;}
+  .medalla span{font-size:.87rem;color:#7d6489;line-height:1.5;}
+  .vacio{text-align:center;color:#b9a3c7;font-size:.9rem;font-weight:600;padding:10px 0;}
+  .contador{
+    text-align:center;font-weight:700;color:#a98ec2;
+    font-size:.88rem;margin-bottom:16px;
+  }
+  #final{
+    margin-top:18px;text-align:center;font-size:1.02rem;font-weight:700;
+    line-height:1.7;color:#c43e6a;
+    background:linear-gradient(135deg,#fff0f6,#fffbe6);
+    border:2px dashed #ffc93c;border-radius:20px;padding:20px;
+    display:none;
+  }
+  #final.visible{display:block;animation:aparecer .8s ease both;}
+
+  .confeti{
+    position:fixed;top:-24px;width:10px;height:15px;border-radius:3px;
+    z-index:99;pointer-events:none;animation:caerConfeti linear forwards;
+  }
+  @keyframes caerConfeti{to{transform:translateY(108vh) rotate(720deg);opacity:.7;}}
+
+  footer{
+    text-align:center;font-size:.82rem;color:#b39ac4;font-weight:600;
+    margin-top:10px;
+  }
+
+  @media (max-width:520px){
+    .card{padding:22px 16px;border-radius:22px;}
+    .mem-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+    .face{font-size:1.35rem;}
+    #playfield{height:300px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="fondo"></div>
+
+<main>
+
+  <!-- HERO -->
+  <header class="card hero">
+    <div class="hero-cat">🐱</div>
+    <h1>Para Verito</h1>
+    <p class="sub">La ingeniera en telecomunicaciones más linda del mundo mundial</p>
+  </header>
+
+  <!-- CARTA -->
+  <section class="card carta">
+    <h2>💌 Una cartita para ti</h2>
+    <p>
+      Mi Verito bella, la negrita más preciosa de todo el mundo mundial:
+      si tu carrera se trata de <span class="destacado">conectar al mundo entero</span>,
+      yo ya estoy conectado a ti desde el primer día, y con la mejor señal del planeta.
+    </p>
+    <p>
+      Me encanta que seas ingeniera en telecomunicaciones, porque hasta las ondas
+      más pequeñas del universo parecen conspirar para que nuestros caminos se encuentren.
+      Tu risa es mi <span class="destacado">fibra óptica</span>: rápida, clara, y no se
+      corta nunca. Tu abrazo tiene más cobertura que cualquier antena, y tu mirada
+      tiene mejor resolución que cualquier pantalla 8K.
+    </p>
+    <p>
+      Admiro lo inteligente que eres, lo mucho que te esfuerzas y la pasión con la que
+      hablas de lo que estudias. Y también admiro que, entre señales, cables y frecuencias,
+      siempre te quede espacio para los gatitos. 🐱
+    </p>
+    <p>
+      Gracias por existir, por ser tan linda por dentro y por fuera, y por dejarme
+      quererte tanto. Si algún día la vida fuera una red, yo elegiría
+      <span class="destacado">conectarme siempre a ti</span>.
+    </p>
+    <p class="firma">Te quiero muchísimo</p>
+  </section>
+
+  <!-- JUEGOS -->
+  <section class="card">
+    <h2>🎮 Jueguitos de ingeniera</h2>
+    <p class="desc" style="margin-bottom:18px;color:#96789f;font-size:.88rem;">
+      Completa los tres juegos para desbloquear tu sorpresa final 🎁
+    </p>
+
+    <!-- JUEGO 1: QUIZ -->
+    <div class="juego">
+      <h3>📡 Quiz de Telecomunicaciones</h3>
+      <p class="desc">Demuestra lo que sabes (aunque tú eres la experta 😌).</p>
+      <div class="progreso" id="quizProgreso">Pregunta 1 de 5</div>
+      <div id="quizContenido"></div>
+    </div>
+
+    <!-- JUEGO 2: MEMORIA -->
+    <div class="juego">
+      <h3>🛰️ Memoria de Señales</h3>
+      <p class="desc">Encuentra todos los pares de símbolos de telecomunicaciones.</p>
+      <div class="mem-grid" id="memGrid"></div>
+      <div class="mem-info" id="memInfo">Pares encontrados: 0 / 6</div>
+    </div>
+
+    <!-- JUEGO 3: ATRAPA GATOS -->
+    <div class="juego">
+      <h3>🐱 Atrapa los Gatitos de Colores</h3>
+      <p class="desc">¡Toca los gatitos (y las estrellas) antes de que caigan! 20 segundos.</p>
+      <div class="cat-hud">
+        <span class="hud-item">🐱 Atrapados: <span id="catScore">0</span></span>
+        <span class="hud-item">⏱️ Tiempo: <span id="catTime">20</span>s</span>
+        <button class="btn" id="catBtn">¡Jugar!</button>
+      </div>
+      <div id="playfield"></div>
+    </div>
+  </section>
+
+  <!-- RECOMPENSAS -->
+  <section class="card">
+    <h2>🏅 Tus recompensas</h2>
+    <div class="contador" id="contador">0 / 3 medallas conseguidas</div>
+    <div class="medallas-lista" id="medallasLista">
+      <p class="vacio" id="vacio">Aún no tienes medallitas... ¡a jugar! 💫</p>
+    </div>
+    <div id="final"></div>
+  </section>
+
+  <footer>Hecho con mucho amor para Verito 🐱📡</footer>
+
+</main>
+
+<script>
+/* ============================================================
+   FONDO FLOTANTE
+============================================================ */
+(function(){
+  const emojis = ['🐱','💖','📡','✨','📶','🌸','💫'];
+  const fondo = document.getElementById('fondo');
+  for(let i=0;i<22;i++){
+    const e = document.createElement('div');
+    e.className = 'emoji-flotante';
+    e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.left = Math.random()*100 + 'vw';
+    e.style.fontSize = (16 + Math.random()*20) + 'px';
+    e.style.animationDuration = (10 + Math.random()*14) + 's';
+    e.style.animationDelay = (-Math.random()*20) + 's';
+    fondo.appendChild(e);
+  }
+})();
+
+/* ============================================================
+   SISTEMA DE MEDALLAS
+============================================================ */
+const TOTAL_MEDALLAS = 3;
+const medallas = {};
+
+function darMedalla(id, icono, titulo, texto){
+  if(medallas[id]) return;
+  medallas[id] = true;
+
+  const vacio = document.getElementById('vacio');
+  if(vacio) vacio.style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = 'medalla';
+  div.innerHTML = `<div class="icono">${icono}</div>
+                   <div><strong>${titulo}</strong><span>${texto}</span></div>`;
+  document.getElementById('medallasLista').appendChild(div);
+
+  const n = Object.keys(medallas).length;
+  document.getElementById('contador').textContent = `${n} / ${TOTAL_MEDALLAS} medallas conseguidas`;
+
+  if(n === TOTAL_MEDALLAS){
+    const final = document.getElementById('final');
+    final.innerHTML = '🎉 ¡LO LOGRASTE, MI INGENIERA FAVORITA! 🎉<br><br>' +
+      'Completaste todos los juegos y te ganaste el premio más grande:<br>' +
+      '<span style="font-size:1.15rem;">🐱 Un abrazo gigante, un beso enorme y todo mi corazón.</span><br><br>' +
+      'Eres la mejor ingeniera, la más inteligente, la más linda y la dueña de todos los gatitos del universo.';
+    final.classList.add('visible');
+    lanzarConfeti();
+    setTimeout(lanzarConfeti, 900);
+    setTimeout(lanzarConfeti, 1800);
+  }
+}
+
+function lanzarConfeti(){
+  const colores = ['#ff6fa5','#a06bff','#ffc93c','#7ee0c0','#ff9ec7'];
+  for(let i=0;i<70;i++){
+    const d = document.createElement('div');
+    d.className = 'confeti';
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.background = colores[Math.floor(Math.random()*colores.length)];
+    d.style.animationDuration = (2 + Math.random()*2) + 's';
+    d.style.animationDelay = (Math.random()*0.7) + 's';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 5200);
+  }
+}
+
+/* ============================================================
+   JUEGO 1: QUIZ
+============================================================ */
+const preguntas = [
+  {
+    q: '¿Qué viaja por dentro de una fibra óptica?',
+    opts: ['Luz', 'Electrones', 'Agua', 'Ondas de sonido'],
+    a: 0,
+    ok: '¡Exacto! La fibra óptica transporta luz, igual de brillante que tú ✨'
+  },
+  {
+    q: '¿En qué unidad se mide la frecuencia?',
+    opts: ['Vatios', 'Hercios (Hz)', 'Metros', 'Segundos'],
+    a: 1,
+    ok: '¡Perfecto! Hercios, y mi corazón late a tu frecuencia 💓'
+  },
+  {
+    q: '¿Cuántas capas tiene el modelo OSI?',
+    opts: ['3', '5', '7', '12'],
+    a: 2,
+    ok: '¡Sí! 7 capitas, como los 7 días que quiero pasar contigo 😌'
+  },
+  {
+    q: '¿Qué significa "LTE" en tu celular?',
+    opts: ['Long Term Evolution', 'Large Telephone Energy', 'Light Transmission Engine', 'Línea Telefónica Especial'],
+    a: 0,
+    ok: '¡Correcto! Long Term Evolution... como nuestro amor: a largo plazo.'
+  },
+  {
+    q: '¿Cuál es la velocidad aproximada de la luz en el vacío?',
+    opts: ['3.000 km/s', '30.000 km/s', '300.000 km/s', '3.000.000 km/s'],
+    a: 2,
+    ok: '¡Eres una genia! 300.000 km/s... rapidísimo, como cuando me enamoré de ti 💘'
+  }
+];
+
+let qIndex = 0;
+let qAciertos = 0;
+let qBloqueado = false;
+
+function renderPregunta(){
+  const cont = document.getElementById('quizContenido');
+  const prog = document.getElementById('quizProgreso');
+
+  if(qIndex >= preguntas.length){
+    prog.textContent = '¡Terminado!';
+    cont.innerHTML = `<p class="pregunta" style="text-align:center;color:#b3568a;">
+        Acertaste ${qAciertos} de ${preguntas.length}
+      </p>`;
+    let texto;
+    if(qAciertos === preguntas.length) texto = '¡PERFECTA! 5/5. Confirmado: eres la ingeniera más inteligente y linda del mundo mundial. 🏆';
+    else if(qAciertos >= 3) texto = `¡Muy bien! ${qAciertos}/5. Se nota que estudiaste telecomunicaciones, mi amor. 📡`;
+    else texto = `Con ${qAciertos}/5 igual te ganas la medalla, porque eres tú y punto.`;
+    darMedalla('quiz', '📡', 'Ingeniera Genial', texto);
+    return;
+  }
+
+  const p = preguntas[qIndex];
+  prog.textContent = `Pregunta ${qIndex+1} de ${preguntas.length}`;
+  cont.innerHTML = `
+    <p class="pregunta">${qIndex+1}. ${p.q}</p>
+    <div class="opciones"></div>
+    <p class="feedback" id="feedback"></p>
+  `;
+  const ops = cont.querySelector('.opciones');
+  p.opts.forEach((op, i) => {
+    const b = document.createElement('button');
+    b.className = 'opcion';
+    b.textContent = op;
+    b.addEventListener('click', () => responder(i, b, p, cont));
+    ops.appendChild(b);
+  });
+  qBloqueado = false;
+}
+
+function responder(i, boton, p, cont){
+  if(qBloqueado) return;
+  qBloqueado = true;
+
+  const botones = cont.querySelectorAll('.opcion');
+  botones.forEach(b => b.disabled = true);
+
+  const feedback = cont.querySelector('#feedback');
+
+  if(i === p.a){
+    boton.classList.add('correcta');
+    qAciertos++;
+    feedback.textContent = p.ok;
+  } else {
+    boton.classList.add('incorrecta');
+    botones[p.a].classList.add('correcta');
+    feedback.textContent = '🐱 ¡Casi! La respuesta correcta era: ' + p.opts[p.a];
+  }
+
+  setTimeout(() => {
+    qIndex++;
+    renderPregunta();
+  }, 1600);
+}
+
+renderPregunta();
+
+/* ============================================================
+   JUEGO 2: MEMORIA
+============================================================ */
+const simbolos = ['📡','🛰️','📶','📞','💻','🔌'];
+let primerCarta = null;
+let segundaCarta = null;
+let memBloqueado = false;
+let paresEncontrados = 0;
+
+function iniciarMemoria(){
+  const grid = document.getElementById('memGrid');
+  grid.innerHTML = '';
+  paresEncontrados = 0;
+  primerCarta = null;
+  segundaCarta = null;
+  memBloqueado = false;
+  document.getElementById('memInfo').textContent = 'Pares encontrados: 0 / 6';
+
+  const cartas = [...simbolos, ...simbolos]
+    .map(s => ({ s, orden: Math.random() }))
+    .sort((a,b) => a.orden - b.orden);
+
+  cartas.forEach(({s}) => {
+    const btn = document.createElement('button');
+    btn.className = 'mem-card';
+    btn.innerHTML = `
+      <div class="mem-inner">
+        <div class="face front">🐱</div>
+        <div class="face back">${s}</div>
+      </div>`;
+    btn.addEventListener('click', () => voltear(btn, s));
+    grid.appendChild(btn);
+  });
+}
+
+function voltear(card, simbolo){
+  if(memBloqueado) return;
+  if(card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+  card.classList.add('flipped');
+
+  if(!primerCarta){
+    primerCarta = { card, simbolo };
+    return;
+  }
+
+  segundaCarta = { card, simbolo };
+  memBloqueado = true;
+
+  if(primerCarta.simbolo === segundaCarta.simbolo){
+    setTimeout(() => {
+      primerCarta.card.classList.add('matched');
+      segundaCarta.card.classList.add('matched');
+      paresEncontrados++;
+      document.getElementById('memInfo').textContent =
+        `Pares encontrados: ${paresEncontrados} / 6`;
+
+      primerCarta = null;
+      segundaCarta = null;
+      memBloqueado = false;
+
+      if(paresEncontrados === 6){
+        darMedalla('memoria', '🛰️', 'Memoria de Satélite',
+          '¡Encontraste los 6 pares! Tienes una memoria increíble, mi amor. Y aun así, lo único que no olvido es lo mucho que te quiero.');
+      }
+    }, 480);
+  } else {
+    setTimeout(() => {
+      primerCarta.card.classList.remove('flipped');
+      segundaCarta.card.classList.remove('flipped');
+      primerCarta = null;
+      segundaCarta = null;
+      memBloqueado = false;
+    }, 900);
+  }
+}
+
+iniciarMemoria();
+
+/* ============================================================
+   JUEGO 3: ATRAPA GATOS DE COLORES
+============================================================ */
+let juegoActivo = false;
+
+document.getElementById('catBtn').addEventListener('click', iniciarCaza);
+
+function iniciarCaza(){
+  if(juegoActivo) return;
+  juegoActivo = true;
+
+  const pf = document.getElementById('playfield');
+  const scoreEl = document.getElementById('catScore');
+  const timeEl = document.getElementById('catTime');
+  const btn = document.getElementById('catBtn');
+
+  pf.innerHTML = '';
+  let score = 0;
+  let tiempo = 20;
+
+  scoreEl.textContent = '0';
+  timeEl.textContent = '20';
+  btn.disabled = true;
+  btn.textContent = '¡Atrápalos!';
+
+  const spawn = setInterval(() => {
+    const el = document.createElement('div');
+    el.className = 'falling-cat';
+    const esGato = Math.random() < 0.72;
+    
+    if (esGato) {
+      // Diferentes tipos de gatos
+      const tiposGato = ['🐱', '🐱', '🐱', '🐈', '🐈‍⬛'];
+      const baseEmoji = tiposGato[Math.floor(Math.random() * tiposGato.length)];
+      el.textContent = baseEmoji;
+
+      // Si es el emoji base amarillo, le aplicamos un filtro de color aleatorio
+      if (baseEmoji === '🐱') {
+        const tonos = [0, 90, 160, 220, 280, 330]; // Rotaciones de color
+        const tonoRandom = tonos[Math.floor(Math.random() * tonos.length)];
+        el.style.filter = `hue-rotate(${tonoRandom}deg) drop-shadow(0 4px 6px rgba(0,0,0,.12))`;
+      } else {
+        el.style.filter = `drop-shadow(0 4px 6px rgba(0,0,0,.12))`;
+      }
+    } else {
+      el.textContent = '⭐';
+      el.style.filter = `drop-shadow(0 4px 6px rgba(0,0,0,.12))`;
+    }
+
+    el.style.left = (Math.random() * 86) + '%';
+    el.style.fontSize = (26 + Math.random() * 16) + 'px';
+    el.style.animationDuration = (1.9 + Math.random() * 1.4) + 's';
+
+    el.addEventListener('pointerdown', ev => {
+      ev.stopPropagation();
+      if(!juegoActivo) return;
+      score++;
+      scoreEl.textContent = score;
+      el.style.transform = 'scale(1.6)';
+      el.style.opacity = '0';
+      el.style.transition = 'all .18s ease';
+      setTimeout(() => el.remove(), 180);
+    }, { once: true });
+
+    pf.appendChild(el);
+    setTimeout(() => el.remove(), 3800);
+  }, 420);
+
+  const timer = setInterval(() => {
+    tiempo--;
+    timeEl.textContent = tiempo;
+
+    if(tiempo <= 0){
+      clearInterval(timer);
+      clearInterval(spawn);
+      juegoActivo = false;
+      pf.innerHTML = '';
+      btn.disabled = false;
+      btn.textContent = '¡Otra vez!';
+
+      let texto;
+      if(score >= 18) texto = `¡Atrapaste ${score}! Eres oficialmente la cazadora de gatitos más rápida del mundo mundial. 🏆🐱`;
+      else if(score >= 10) texto = `¡Atrapaste ${score}! Nada mal, mi ingeniera. Los gatitos de colores te adoran. 🐱`;
+      else texto = `Atrapaste ${score}. Los gatitos se escaparon, pero tranquila: igual te ganaste la medalla por ser tan linda. 🐱`;
+
+      darMedalla('gatos', '🐱', 'Cazadora de Gatitos', texto);
+    }
+  }, 1000);
+}
+</script>
+
+</body>
+</html>
